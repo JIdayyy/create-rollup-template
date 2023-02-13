@@ -13,12 +13,16 @@
   "author": "raphael mansuy",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^14.14.20",
+    "@types/figlet": "^1.5.5",
+    "@types/inquirer": "^8.2.5",
+    "@types/node": "^14.18.36",
     "@types/yargs": "^17.0.22",
     "typescript": "^4.1.3"
   },
   "dependencies": {
-    "inquirer": "^9.1.4",
+    "chalk": "^4.0.0",
+    "figlet": "^1.5.2",
+    "inquirer": "^8.2.5",
     "yargs": "^17.6.2"
   }
 }

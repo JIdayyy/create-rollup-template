@@ -1,120 +1,90 @@
 #!/usr/bin/env node
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs = require("fs");
-const yargs = require("yargs");
-const currentDir = process.cwd();
-const createFolder = (folderName) => {
-    const path = `${currentDir}/${folderName}`;
-    if (!fs.existsSync(path)) {
-        fs.mkdirSync(path);
+var yargs_1 = require("yargs");
+var files_1 = require("./templates/files");
+var package_json_1 = require("./templates/package.json");
+var rollup_1 = require("./templates/rollup");
+var tsconfig_1 = require("./templates/tsconfig");
+var inquirer_1 = require("./inquirer");
+var fs_1 = require("fs");
+var currentDir = process.cwd();
+var createFolder = function (folderName) {
+    var path = "".concat(currentDir, "/").concat(folderName);
+    if (!(0, fs_1.existsSync)(path)) {
+        (0, fs_1.mkdirSync)(path);
     }
 };
-const createFile = (fileName, data) => {
-    const path = `${currentDir}/${fileName}`;
-    if (!fs.existsSync(path)) {
-        fs.writeFileSync(path, data);
+var createFile = function (fileName, data) {
+    var path = "".concat(currentDir, "/").concat(fileName);
+    if (!(0, fs_1.existsSync)(path)) {
+        (0, fs_1.writeFileSync)(path, data);
     }
 };
-const rollupTemplate = `
-import typescript from 'rollup-plugin-typescript2';
-import commonjs from 'rollup-plugin-commonjs';
-import resolve from 'rollup-plugin-node-resolve';
-import pkg from './package.json';
-
-export default {
-    input: 'src/index.ts',
-    output: [
-        {
-            file: pkg.main,
-            format: 'cjs',
-            sourcemap: true,
-        },
-        {
-            file: pkg.module,
-            format: 'es',
-            sourcemap: true,
-        },
-    ],
-    plugins: [
-        resolve(),
-        commonjs(),
-        typescript({ useTsconfigDeclarationDir: true }),
-    ],
-};
-`;
-const tsconfigTemplate = `
-{
-    "compilerOptions": {
-        "target": "es5",
-        "module": "commonjs",
-        "declaration": true,
-        "declarationMap": true,
-        "sourceMap": true,
-        "outDir": "dist",
-        "rootDir": "src",
-        "strict": true,
-        "esModuleInterop": true,
-        "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true,
-        "noEmit": true
-    },
-    "include": ["src"],
-    "exclude": ["node_modules"]
-}
-`;
-const packageJsonTemplate = `
-{
-    "name": "my-lib",
-    "version": "1.0.0",
-    "main": "dist/index.js",
-    "module": "dist/index.es.js",
-    "types": "dist/index.d.ts",
-    "scripts": {
-        "build": "rollup -c"
-    },
-    "devDependencies": {
-        "rollup": "^1.20.3",
-        "rollup-plugin-commonjs": "^10.0.1",
-        "rollup-plugin-node-resolve": "^5.2.0",
-        "rollup-plugin-typescript2": "^0.25.2",
-        "typescript": "^3.7.2"
-    }
-}
-`;
-const indexTemplate = `
-export const myLib = () => 'myLib';
-`;
-const gitignoreTemplate = `
-node_modules
-dist
-`;
-const readmeTemplate = `
-# my-lib
-`;
-yargs.command({
-    command: 'create',
-    describe: 'Create a new library',
-    builder: {
-        name: {
-            describe: 'Name of the library',
-            demandOption: true,
-            type: 'string'
+var createLib = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var res;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, (0, inquirer_1.default)("What is the name of your library?")];
+            case 1:
+                res = _a.sent();
+                (0, yargs_1.command)({
+                    command: "create",
+                    describe: "Create a new library",
+                    handler: function (argv) {
+                        var folderName = res.name;
+                        createFolder(folderName);
+                        createFolder("".concat(folderName, "/src"));
+                        process.chdir(folderName);
+                        createFile("".concat(folderName, "/rollup.config.js"), rollup_1.default);
+                        createFile("".concat(folderName, "/tsconfig.json"), tsconfig_1.default);
+                        createFile("".concat(folderName, "/package.json"), package_json_1.default);
+                        createFile("".concat(folderName, "/.gitignore"), files_1.gitignoreTemplate);
+                        createFile("".concat(folderName, "/README.md"), files_1.readmeTemplate);
+                        createFile("".concat(folderName, "/src/index.ts"), files_1.indexTemplate);
+                        console.log("Rollup template ".concat(folderName, " created!"));
+                    },
+                });
+                (0, yargs_1.parse)();
+                return [2 /*return*/];
         }
-    },
-    handler: (argv) => {
-        const folderName = argv.name;
-        createFolder(folderName);
-        createFolder(`${folderName}/src`);
-        process.chdir(folderName);
-        createFile(`${folderName}/rollup.config.js`, rollupTemplate);
-        createFile(`${folderName}/tsconfig.json`, tsconfigTemplate);
-        createFile(`${folderName}/package.json`, packageJsonTemplate);
-        createFile(`${folderName}/.gitignore`, gitignoreTemplate);
-        createFile(`${folderName}/README.md`, readmeTemplate);
-        createFile(`${folderName}/src/index.ts`, indexTemplate);
-        console.log(`Rollup template ${folderName} created!`);
-    }
-}).demandCommand(1);
-yargs.parse();
+    });
+}); };
+createLib();
 //# sourceMappingURL=index.js.map
