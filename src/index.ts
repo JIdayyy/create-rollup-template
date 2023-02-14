@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 import { command, parse } from "yargs";
+import { prompt as inquirerPrompt } from "inquirer";
+import { exec } from "child_process";
 import {
   gitignoreTemplate,
   readmeTemplate,
@@ -54,6 +56,43 @@ const createLib = async () => {
   });
 
   parse();
+
+  return res.name;
 };
 
-createLib();
+const installDependencies = async (name: string) => {
+  const res = await inquirerPrompt([
+    {
+      type: "list",
+      name: "name",
+      message: "Do you want to install dependencies?",
+      choices: ["yes", "no"],
+    },
+  ]);
+
+  if (res.name === "no") {
+    console.log("Dependencies not installed!");
+    console.log("cd " + name);
+    console.log("npm install");
+  }
+
+  if (res.name === "yes") {
+    console.log("Installing dependencies...");
+
+    exec("npm install", (err, stdout, stderr) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      console.log(stdout);
+    });
+
+    console.log("Dependencies installed!");
+
+    console.log("Building library...");
+  }
+};
+
+createLib().then((name) => {
+  installDependencies(name);
+});

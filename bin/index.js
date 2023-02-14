@@ -38,11 +38,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var yargs_1 = require("yargs");
+var inquirer_1 = require("inquirer");
+var child_process_1 = require("child_process");
 var files_1 = require("./templates/files");
 var package_json_1 = require("./templates/package.json");
 var rollup_1 = require("./templates/rollup");
 var tsconfig_1 = require("./templates/tsconfig");
-var inquirer_1 = require("./inquirer");
+var inquirer_2 = require("./inquirer");
 var fs_1 = require("fs");
 var currentDir = process.cwd();
 var createFolder = function (folderName) {
@@ -61,7 +63,7 @@ var createLib = function () { return __awaiter(void 0, void 0, void 0, function 
     var res;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, (0, inquirer_1.default)("What is the name of your library?")];
+            case 0: return [4 /*yield*/, (0, inquirer_2.default)("What is the name of your library?")];
             case 1:
                 res = _a.sent();
                 (0, yargs_1.command)({
@@ -82,9 +84,46 @@ var createLib = function () { return __awaiter(void 0, void 0, void 0, function 
                     },
                 });
                 (0, yargs_1.parse)();
+                return [2 /*return*/, res.name];
+        }
+    });
+}); };
+var installDependencies = function (name) { return __awaiter(void 0, void 0, void 0, function () {
+    var res;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, (0, inquirer_1.prompt)([
+                    {
+                        type: "list",
+                        name: "name",
+                        message: "Do you want to install dependencies?",
+                        choices: ["yes", "no"],
+                    },
+                ])];
+            case 1:
+                res = _a.sent();
+                if (res.name === "no") {
+                    console.log("Dependencies not installed!");
+                    console.log("cd " + name);
+                    console.log("npm install");
+                }
+                if (res.name === "yes") {
+                    console.log("Installing dependencies...");
+                    (0, child_process_1.exec)("npm install", function (err, stdout, stderr) {
+                        if (err) {
+                            console.error(err);
+                            return;
+                        }
+                        console.log(stdout);
+                    });
+                    console.log("Dependencies installed!");
+                    console.log("Building library...");
+                }
                 return [2 /*return*/];
         }
     });
 }); };
-createLib();
+createLib().then(function (name) {
+    installDependencies(name);
+});
 //# sourceMappingURL=index.js.map
